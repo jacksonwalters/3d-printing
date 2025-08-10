@@ -67,7 +67,7 @@ module fractal_tetra(s, depth) {
             face1_rotation = vector_to_euler(face1_normal);
             
             translate(0.5 * face1_center)
-            translate(face1_normal * next_size * 0.0)  // offset along normal
+            translate(face1_normal * next_size * 0.0)  // don't offset along normal
             rotate(face1_rotation)
             fractal_tetra(next_size, depth - 1);
             
@@ -76,8 +76,8 @@ module fractal_tetra(s, depth) {
             face2_normal = face_normal(v1, v2, v3, center);
             face2_rotation = vector_to_euler(face2_normal);
             
-            translate(face2_center)
-            translate(face2_normal * next_size * 0.5)
+            translate(1.0 * face2_center)
+            translate(face2_normal * next_size * 0.0) // don't offset along normal
             rotate(face2_rotation)
             fractal_tetra(next_size, depth - 1);
             
@@ -86,8 +86,8 @@ module fractal_tetra(s, depth) {
             face3_normal = face_normal(v2, v0, v3, center);
             face3_rotation = vector_to_euler(face3_normal);
             
-            translate(face3_center)
-            translate(face3_normal * next_size * 0.5)
+            translate(0.5 * face3_center)
+            translate(face3_normal * next_size * 0.0)
             rotate(face3_rotation)
             fractal_tetra(next_size, depth - 1);
         }
