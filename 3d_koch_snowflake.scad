@@ -107,25 +107,27 @@ module fractal_tetra_simple(s, depth) {
             h = sqrt(6)/3 * s;  // tetrahedron height
             face_height = h * 2/3;
             
-            // Front face 
+            // Front face
+            // u = [s,0,0], v = [s/2,sqrt(3)/6 * s, sqrt(6)/3 * s]
             rotate([70.53, 0, 0])  // this is arccos(1/3) ~ 70.53deg
-            translate([1/3, sqrt(3)/12 , 2*sqrt(6)/9 ] * s * 0.0)
-            translate([0, 0, next_size * sqrt(6)/12] * 0.0)
+            translate(0.18 * [s,0,0])
+            translate(0.15 * [s/2,sqrt(3)/2 * s, 0])
             fractal_tetra_simple(next_size, depth - 1);
             
             // Right face
+            // u = [s, 0, 0], v = [s/2, sqrt(3)/6 * s, sqrt(6)/3 * s];
             rotate([2*(90-70.53), 0, 60]) // twice the angle between the face and 90deg
-            translate([3/4, 5*sqrt(3)/12, sqrt(6)/3 * 2/3] * s * 0.0)
-            translate([0, 0, next_size * sqrt(6)/12] * 0.0)
+            translate(0.18 * [s, 0, 0])
+            translate(0.15 * [s/2, sqrt(3)/6 * s, sqrt(6)/3 * s])
             fractal_tetra_simple(next_size, depth - 1);
             
             // Left face
-            //rotate([0,0,180])
-            translate([30,0,0])
+            // u = [-s/2, -sqrt(3)/2 * s, 0], v = [0, -sqrt(3)/3 * s, sqrt(6)/3 * s];
+            translate([s,0,0])
             rotate([0, 0, 60])
-            rotate([-22,-35,5])
-            translate([s/4, 5*sqrt(3)/12 * s, face_height] * 0.0)
-            translate([0, 0, next_size * sqrt(6)/12] * 0.0)
+            rotate([-22,-33,7]) //TO-DO: these need to be exact values
+            translate(-0.30 * [-s/2, -sqrt(3)/2 * s, 0])
+            translate(0.15 * [0, -sqrt(3)/3 * s, sqrt(6)/3 * s])
             fractal_tetra_simple(next_size, depth - 1);
         }
     }
