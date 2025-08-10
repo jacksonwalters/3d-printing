@@ -2,7 +2,7 @@
 size = 30;
 nozzle_width = 0.4;
 scale_factor = 0.5;
-recursion_depth = 3;
+recursion_depth = 2;
 
 // Vector helpers
 function v_sub(a,b) = [a[0]-b[0], a[1]-b[1], a[2]-b[2]];
@@ -31,18 +31,20 @@ function vector_to_euler(vec) =
     )
     [rot_x, rot_y, 0];
 
-// Base tetrahedron module
 module tetra(s) {
-    hull() {
-        for (p = [
-            [0, 0, 0],
-            [s, 0, 0],
-            [s/2, sqrt(3)/2 * s, 0],
-            [s/2, sqrt(3)/6 * s, sqrt(6)/3 * s]
-        ]) {
-            translate(p) sphere(0.01);
-        }
-    }
+    points = [
+        [0, 0, 0],
+        [s, 0, 0],
+        [s/2, (sqrt(3)/2)*s, 0],
+        [s/2, (sqrt(3)/6)*s, sqrt(6)/3 * s]
+    ];
+    faces = [
+        [0, 1, 2],  // base
+        [0, 1, 3],  // side 1
+        [1, 2, 3],  // side 2
+        [2, 0, 3]   // side 3
+    ];
+    polyhedron(points=points, faces=faces);
 }
 
 // Recursive fractal
@@ -67,7 +69,6 @@ module fractal_tetra(s, depth) {
             face1_rotation = vector_to_euler(face1_normal);
             
             translate(0.5 * face1_center)
-            translate(face1_normal * next_size * 0.0)  // don't offset along normal
             rotate(face1_rotation)
             fractal_tetra(next_size, depth - 1);
             
@@ -77,7 +78,6 @@ module fractal_tetra(s, depth) {
             face2_rotation = vector_to_euler(face2_normal);
             
             translate(1.0 * face2_center)
-            translate(face2_normal * next_size * 0.0) // don't offset along normal
             rotate(face2_rotation)
             fractal_tetra(next_size, depth - 1);
             
@@ -87,7 +87,6 @@ module fractal_tetra(s, depth) {
             face3_rotation = vector_to_euler(face3_normal);
             
             translate(0.5 * face3_center)
-            translate(face3_normal * next_size * 0.0)
             rotate(face3_rotation)
             fractal_tetra(next_size, depth - 1);
         }
@@ -109,31 +108,34 @@ module fractal_tetra_simple(s, depth) {
             face_height = h * 2/3;
             
             // Front face 
-            translate([s/2, sqrt(3)/12 * s, face_height])
-            rotate([35.26, 0, 0])  // This is acos(sqrt(2/3)) - angle from vertical to face normal
-            translate([0, 0, next_size * sqrt(6)/12])
+            rotate([70.53, 0, 0])  // this is arccos(1/3) ~ 70.53deg
+            translate([1/3, sqrt(3)/12 , 2*sqrt(6)/9 ] * s * 0.0)
+            translate([0, 0, next_size * sqrt(6)/12] * 0.0)
             fractal_tetra_simple(next_size, depth - 1);
             
             // Right face
-            translate([3*s/4, 5*sqrt(3)/12 * s, face_height])
-            rotate([35.26, 0, 120])
-            translate([0, 0, next_size * sqrt(6)/12])
+            rotate([2*(90-70.53), 0, 60]) // twice the angle between the face and 90deg
+            translate([3/4, 5*sqrt(3)/12, sqrt(6)/3 * 2/3] * s * 0.0)
+            translate([0, 0, next_size * sqrt(6)/12] * 0.0)
             fractal_tetra_simple(next_size, depth - 1);
             
             // Left face
-            translate([s/4, 5*sqrt(3)/12 * s, face_height])
-            rotate([35.26, 0, 240])
-            translate([0, 0, next_size * sqrt(6)/12])
+            //rotate([0,0,180])
+            translate([30,0,0])
+            rotate([0, 0, 60])
+            rotate([-22,-35,5])
+            translate([s/4, 5*sqrt(3)/12 * s, face_height] * 0.0)
+            translate([0, 0, next_size * sqrt(6)/12] * 0.0)
             fractal_tetra_simple(next_size, depth - 1);
         }
     }
 }
 
 // Main call - try the simple version first
-//fractal_tetra_simple(size, recursion_depth);
+fractal_tetra_simple(size, recursion_depth);
 
 // Uncomment to try the calculated version instead:
-fractal_tetra(size, recursion_depth);
+// fractal_tetra(size, recursion_depth);
 
 echo("Tetrahedral Fractal Parameters:");
 echo(str("Base Size: ", size));
