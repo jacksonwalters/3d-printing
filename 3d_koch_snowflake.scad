@@ -2,7 +2,7 @@
 size = 30;
 nozzle_width = 0.4;
 scale_factor = 0.5;
-recursion_depth = 3;
+recursion_depth = 2;
 
 module tetra(s) {
     points = [
@@ -24,6 +24,7 @@ module tetra(s) {
 // Simpler approach using known tetrahedron geometry
 module fractal_tetra_simple(s, depth) {
     if (s >= nozzle_width && depth > 0) {
+        echo(str("depth: ", depth, " size: " , s))
         tetra(s);
         
         next_size = s * scale_factor;
@@ -37,28 +38,26 @@ module fractal_tetra_simple(s, depth) {
             
             // Front face
             // u = [s,0,0], v = [s/2,sqrt(3)/6 * s, sqrt(6)/3 * s]
-            rotate([70.53, 0, 0])  // this is arccos(1/3) ~ 70.53deg
+            rotate([acos(1/3), 0, 0])  // this is arccos(1/3) ~ 70.53deg
             translate(0.18 * [s,0,0])
             translate(0.15 * [s/2,sqrt(3)/2 * s, 0])
-            echo(str("front face recursion: ", depth))
             fractal_tetra_simple(next_size, depth - 1);
             
             // Right face
             // u = [s, 0, 0], v = [s/2, sqrt(3)/6 * s, sqrt(6)/3 * s];
-            rotate([2*(90-70.53), 0, 60]) // twice the angle between the face and 90deg
+            rotate([2*(90-acos(1/3)), 0, 60]) // twice the angle between the face and 90deg
             translate(0.18 * [s, 0, 0])
             translate(0.15 * [s/2, sqrt(3)/6 * s, sqrt(6)/3 * s])
-            echo(str("right face recursion: ", depth))
             fractal_tetra_simple(next_size, depth - 1);
             
             // Left face
             // u = [-s/2, -sqrt(3)/2 * s, 0], v = [0, -sqrt(3)/3 * s, sqrt(6)/3 * s];
-            translate([s,0,0])
+            edge_vector = [1/2, (sqrt(3)/2), 0]; // [s,0,0] - [s/2,(sqrt(3)/2)*s,0]
+            translate([3/4 * s, sqrt(3)/4 * s, 0])
             rotate([0, 0, 60])
-            rotate([-22,-33,7]) //TO-DO: these need to be exact values
-            translate(-0.30 * [-s/2, -sqrt(3)/2 * s, 0])
+            rotate(-2*(90-acos(1/3)), edge_vector)
+            translate(-0.18 * [s/2, sqrt(3)/2 * s, 0])
             translate(0.15 * [0, -sqrt(3)/3 * s, sqrt(6)/3 * s])
-            echo(str("left face recursion: ", depth))
             fractal_tetra_simple(next_size, depth - 1);
         }
     }
