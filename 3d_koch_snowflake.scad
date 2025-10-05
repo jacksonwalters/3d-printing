@@ -67,9 +67,6 @@ module fractal_tetra_simple(s, depth) {
 // Main call - try the simple version first
 fractal_tetra_simple(size, recursion_depth);
 
-// Uncomment to try the calculated version instead:
-// fractal_tetra(size, recursion_depth);
-
 echo("Tetrahedral Fractal Parameters:");
 echo(str("Base Size: ", size));
 echo(str("Scale Factor: ", scale_factor));  
